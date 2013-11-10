@@ -27,7 +27,7 @@
 #include "YMGANCWidgetFactory.h"
 #include <yui/gtk/YGUI.h>
 #include <yui/YUIException.h>
-#include <YWE.h>
+#include <YExternalWidgets.h>
 
 
 #include <string>

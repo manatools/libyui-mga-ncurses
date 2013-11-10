@@ -23,9 +23,9 @@
 
 #ifndef YNCWE_h
 #define YNCWE_h
-#include <YWE.h>
+#include <yui/YExternalWidgets.h>
 
-class YNCWE : public YWE
+class YNCWE : public YExternalWidgets
 {
 public:
   YNCWE();
@@ -33,7 +33,7 @@ public:
 
 protected:
 
-  virtual YWidgetExtensionFactory * createWidgetExtensionFactory();
+  virtual YExternalWidgetsFactory * createExternalWidgetsFactory();
 };
 
 #endif //YNCWE_h

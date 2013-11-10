@@ -25,7 +25,7 @@
 #include "YMGANCWidgetFactory.h"
 #include <yui/YUIException.h>
 
-YNCWE::YNCWE() : YWE()
+YNCWE::YNCWE() : YExternalWidgets()
 {
 }
 
@@ -33,7 +33,7 @@ YNCWE::~YNCWE()
 {
 }
 
-YWidgetExtensionFactory* YNCWE::createWidgetExtensionFactory()
+YExternalWidgetsFactory* YNCWE::createExternalWidgetsFactory()
 {
   YMGANCWidgetFactory * factory = new YMGANCWidgetFactory();
   YUI_CHECK_NEW( factory );
@@ -41,13 +41,13 @@ YWidgetExtensionFactory* YNCWE::createWidgetExtensionFactory()
   return factory;
 }
 
-YWE * createWE(  )
+YExternalWidgets * createWE(  )
 {
-    if ( ! YWE::we() )
+    if ( ! YExternalWidgets::externalWidgets() )
     {
         YNCWE * ue = new YNCWE( );
         YUI_CHECK_NEW ( ue );
     }
 
-    return YWE::we();
+    return YExternalWidgets::externalWidgets();
 }
