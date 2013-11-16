@@ -163,7 +163,7 @@ void YMGA_NCCBTable::setHeader ( std::vector<std::string> head )
 
   hasHeadline = myPad()->SetHeadline ( _header );
 
-  YTable::setTableHeader ( th );
+  YMGA_CBTable::setTableHeader ( th );
 }
 
 //
@@ -226,7 +226,7 @@ void YMGA_NCCBTable::addItem ( YItem *yitem, bool allAtOnce )
 {
   YTableItem *item = dynamic_cast<YTableItem *> ( yitem );
   YUI_CHECK_PTR ( item );
-  YTable::addItem ( item );
+  YMGA_CBTable::addItem ( item );
   unsigned int itemCount;
   YTableMode mode = selectionMode();
 
@@ -336,7 +336,7 @@ void YMGA_NCCBTable::deleteAllItems()
 {
   myPad()->ClearTable();
   DrawPad();
-  YTable::deleteAllItems();
+  YMGA_CBTable::deleteAllItems();
 }
 
 
@@ -405,7 +405,7 @@ void YMGA_NCCBTable::selectItem ( YItem *yitem, bool selected )
     {
       // first highlight only, then select
       setCurrentItem ( line->getIndex() );
-      YTable::selectItem ( item, selected );
+      YMGA_CBTable::selectItem ( item, selected );
     }
   }
   else
@@ -415,7 +415,7 @@ void YMGA_NCCBTable::selectItem ( YItem *yitem, bool selected )
       checkable_column = columns();
 
     setCurrentItem ( line->getIndex() );
-    YTable::selectItem ( item, selected );
+    YMGA_CBTable::selectItem ( item, selected );
 
     yuiMilestone() << item->label() << " is selected: " << ( selected?"yes":"no" ) <<  endl;
 
@@ -438,7 +438,7 @@ void YMGA_NCCBTable::selectCurrentItem()
   const NCTableLine *cline = myPad()->GetLine ( myPad()->CurPos().L );
 
   if ( cline )
-    YTable::selectItem ( cline->origItem(), true );
+    YMGA_CBTable::selectItem ( cline->origItem(), true );
 }
 
 
@@ -451,11 +451,11 @@ void YMGA_NCCBTable::deselectAllItems()
   if ( mode == YTableSingleLineSelection )
   {
     setCurrentItem ( -1 );
-    YTable::deselectAllItems();
+    YMGA_CBTable::deselectAllItems();
   }
   else
   {
-    YItemCollection itemCollection = YTable::selectedItems();
+    YItemCollection itemCollection = YMGA_CBTable::selectedItems();
     for ( YItemConstIterator it = itemCollection.begin();
           it != itemCollection.end(); ++it )
     {
@@ -511,7 +511,7 @@ void YMGA_NCCBTable::setLabel ( const std::string & nlabel )
 void YMGA_NCCBTable::setEnabled ( bool do_bv )
 {
   NCWidget::setEnabled ( do_bv );
-  YTable::setEnabled ( do_bv );
+  YMGA_CBTable::setEnabled ( do_bv );
 }
 
 
