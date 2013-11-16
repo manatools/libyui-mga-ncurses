@@ -33,7 +33,7 @@ public:
 
 protected:
 
-  virtual YExternalWidgetsFactory * createExternalWidgetsFactory();
+  virtual YExternalWidgetFactory * createExternalWidgetFactory();
 };
 
 #endif //YNCWE_h
