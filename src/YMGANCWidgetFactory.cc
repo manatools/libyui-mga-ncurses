@@ -25,7 +25,7 @@
 #include <yui/YUILog.h>
 
 #include "YMGANCWidgetFactory.h"
-#include <yui/gtk/YGUI.h>
+#include <yui/ncurses/YNCursesUI.h>
 #include <yui/YUIException.h>
 #include <YExternalWidgets.h>
 
