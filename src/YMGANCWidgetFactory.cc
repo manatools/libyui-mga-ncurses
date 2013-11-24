@@ -51,7 +51,7 @@ YMGANCWidgetFactory::~YMGANCWidgetFactory()
 
 
 YMGA_CBTable *
-YMGANCWidgetFactory::createTable( YWidget * parent, YTableHeader * header, YTableMode mode )
+YMGANCWidgetFactory::createCBTable( YWidget * parent, YTableHeader * header, YTableMode mode )
 {
     YMGA_NCCBTable * table = new YMGA_NCCBTable( parent, header, mode );
     YUI_CHECK_NEW( table );

@@ -608,6 +608,7 @@ NCursesEvent YMGA_NCCBTable::wHandleInput ( wint_t key )
              mode == YTableCheckBoxOnFirstColumn || 
              mode == YTableCheckBoxOnLastColumn) )
         {
+          YMGA_CBTable::setChangedItem(getCurrentItemPointer());
           return NCursesEvent::ValueChanged;
         }
       }
