@@ -28,7 +28,7 @@
 class YNCWE : public YExternalWidgets
 {
 public:
-  YNCWE();
+  YNCWE( const std::string& name );
   virtual ~YNCWE();
 
 protected:
