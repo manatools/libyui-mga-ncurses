@@ -35,7 +35,7 @@ class YMGA_NCCBTable : public YMGA_CBTable, public NCPadWidget
 {
 public:
 
-    YMGA_NCCBTable( YWidget * parent, YTableHeader *tableHeader, YTableMode mode = YTableMode::YTableSingleLineSelection );
+    YMGA_NCCBTable( YWidget * parent, YTableHeader *tableHeader, YCBTableMode mode = YCBTableMode::YCBTableCheckBoxOnFirstColumn);
 
     virtual ~YMGA_NCCBTable();
 
@@ -90,6 +90,8 @@ public:
     void stripHotkeys() { myPad()->stripHotkeys(); }
 
     void setSortStrategy( NCTableSortStrategyBase * newStrategy ) { myPad()->setSortStrategy( newStrategy ); }
+    
+    void checkItem( YItem* yitem, bool checked = true );
 
 protected:
 

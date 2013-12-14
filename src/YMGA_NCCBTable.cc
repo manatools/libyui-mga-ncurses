@@ -44,7 +44,7 @@ using std::endl;
  * provided to allow NCTable to specify the line number itself (getCurrentItem).
  *
  */
-YMGA_NCCBTable::YMGA_NCCBTable ( YWidget * parent, YTableHeader *tableHeader, YTableMode mode )
+YMGA_NCCBTable::YMGA_NCCBTable ( YWidget * parent, YTableHeader *tableHeader, YCBTableMode mode )
   : YMGA_CBTable ( parent, tableHeader, mode )
   , NCPadWidget ( parent )
   , biglist ( false )
@@ -56,42 +56,20 @@ YMGA_NCCBTable::YMGA_NCCBTable ( YWidget * parent, YTableHeader *tableHeader, YT
   yuiMilestone() << " Slection mode " << mode <<  std::endl;
 
   // !!! head is UTF8 encoded, thus should be std::vector<NCstring>
-  if ( mode == YTableSingleLineSelection )
-  {
-    _header.assign ( tableHeader->columns(), NCstring ( "" ) );
-    for ( int col = 0; col < tableHeader->columns(); col++ )
-    {
-      if ( hasColumn ( col ) )
-      {
-        // set alignment first
-        setAlignment ( col, alignment ( col ) );
-        // and then append header
-        _header[ col ] +=  NCstring ( tableHeader->header ( col ) ) ;
-      }
-    }
-  }
-  else
-  {
-    _header.assign ( tableHeader->columns() +1, NCstring ( "" ) );
-    int columNumber = columns();
-    int col_offset  = 0;
-    if ( mode == YTableCheckBoxOnFirstColumn || mode == YTableMultiSelection )
-    {
-      col_offset   = 1;
-      columNumber += 1;
-    }
+  _header.assign ( tableHeader->columns() +1, NCstring ( "" ) );
+  int columNumber = columns();
 
-    for ( int col = col_offset; col < columNumber; col++ )
+  for ( int col = 0; col < columNumber; col++ )
+  {
+    if ( hasColumn ( col ) )
     {
-      if ( hasColumn ( col-col_offset ) )
-      {
-        // set alignment first
-        setAlignment ( col, alignment ( col-col_offset ) );
-        // and then append header
-        _header[ col ] +=  NCstring ( tableHeader->header ( col-col_offset ) ) ;
-      }
+      // set alignment first
+      setAlignment ( col, alignment ( col ) );
+      // and then append header
+      _header[ col ] +=  NCstring ( tableHeader->header ( col ) ) ;
     }
   }
+
 
   hasHeadline = myPad()->SetHeadline ( _header );
 
@@ -224,73 +202,48 @@ void YMGA_NCCBTable::addItem ( YItem *yitem )
 // true, it is up to the caller to redraw the table.
 void YMGA_NCCBTable::addItem ( YItem *yitem, bool allAtOnce )
 {
-  YTableItem *item = dynamic_cast<YTableItem *> ( yitem );
+  YCBTableItem *item = dynamic_cast<YCBTableItem *> ( yitem );
   YUI_CHECK_PTR ( item );
   YMGA_CBTable::addItem ( item );
   unsigned int itemCount;
-  YTableMode mode = selectionMode();
+  YCBTableMode mode = tableMode();
 
-  if ( mode == YTableSingleLineSelection )
+//   if ( mode == YTableSingleLineSelection )
     itemCount = columns();
-  else
-    itemCount = columns() +1;
+//   else
+//     itemCount = columns() +1;
 
   std::vector<NCTableCol*> Items ( itemCount );
-  unsigned int i = 0;
+  int i = 0;
 
-  if ( mode == YTableSingleLineSelection )
+  if ( mode == YCBTableCheckBoxOnFirstColumn )
   {
-    // Iterate over cells to create columns
-    for ( YTableCellIterator it = item->cellsBegin();
-          it != item->cellsEnd();
-          ++it )
+    // Create the tag first
+    Items[0] = new NCTableTag ( yitem, item->checked() );
+    i++;
+  }
+  // and then iterate over cells
+  for ( YTableCellIterator it = item->cellsBegin();
+        it != item->cellsEnd();
+        ++it )
+  {
+    if ( i >= columns() )
     {
-      if ( i > 0 && ( signed ) i >= columns() )
-      {
-        yuiWarning() << "Item contains too many columns, current is " << i
-                     << " but only " << columns() << " columns are configured" << std::endl;
-        i++;
-      }
-      else
-      {
-        Items[i] = new NCTableCol ( NCstring ( ( *it )->label() ) );
-        i++;
-      }
+      yuiWarning() << "Item contains too many columns, current is " << i
+                    << " but only " << columns() << " columns are configured" << std::endl;
+      i++;
+    }
+    else
+    {
+      yuiDebug() << "current column is " << i << "/" << columns() << " (" << ( *it )->label() << ")" << std::endl;
+      Items[i] = new NCTableCol ( NCstring ( ( *it )->label() ) );
+      i++;
     }
   }
-  else
+  if ( mode == YCBTableCheckBoxOnLastColumn )
   {
-    int columOffset = 0;
-    if ( mode == YTableCheckBoxOnFirstColumn || mode == YTableMultiSelection )
-    {
-      // Create the tag first
-      Items[0] = new NCTableTag ( yitem, yitem->selected() );
-      i++;
-      columOffset = 1;
-    }
-    // and then iterate over cells
-    for ( YTableCellIterator it = item->cellsBegin();
-          it != item->cellsEnd();
-          ++it )
-    {
-      if ( i > 0 && ( signed ) ( i-columOffset ) >= columns() )
-      {
-        yuiWarning() << "Item contains too many columns, current is " << i-columOffset
-                     << " but only " << columns() << " columns are configured" << std::endl;
-        i++;
-      }
-      else
-      {
-        yuiDebug() << "current column is " << i-columOffset << "/" << columns() << " (" << ( *it )->label() << ")" << std::endl;
-        Items[i] = new NCTableCol ( NCstring ( ( *it )->label() ) );
-        i++;
-      }
-    }
-    if ( mode == YTableCheckBoxOnLastColumn )
-    {
-      // Create the tag at last column
-      Items[columns()] = new NCTableTag ( yitem, yitem->selected() );
-    }
+    // Create the tag at last column
+    Items[columns()-1] = new NCTableTag ( yitem, item->checked() );
   }
 
   //Insert @idx
@@ -385,7 +338,7 @@ void YMGA_NCCBTable::selectItem ( YItem *yitem, bool selected )
   if ( ! yitem )
     return;
 
-  YTableItem *item = dynamic_cast<YTableItem *> ( yitem );
+  YCBTableItem *item = dynamic_cast<YCBTableItem *> ( yitem );
   YUI_CHECK_PTR ( item );
 
   NCTableLine *line = ( NCTableLine * ) item->data();
@@ -394,33 +347,15 @@ void YMGA_NCCBTable::selectItem ( YItem *yitem, bool selected )
   const NCTableLine *current_line = myPad()->GetLine ( myPad()->CurPos().L );
   YUI_CHECK_PTR ( current_line );
 
-  YTableMode mode = selectionMode();
-  if ( mode == YTableSingleLineSelection )
+  if ( !selected && ( line == current_line ) )
   {
-    if ( !selected && ( line == current_line ) )
-    {
-      deselectAllItems();
-    }
-    else
-    {
-      // first highlight only, then select
-      setCurrentItem ( line->getIndex() );
-      YMGA_CBTable::selectItem ( item, selected );
-    }
+    deselectAllItems();
   }
   else
   {
-    int checkable_column = 0;
-    if ( mode == YTableCheckBoxOnLastColumn )
-      checkable_column = columns();
-
+    // first highlight only, then select
     setCurrentItem ( line->getIndex() );
     YMGA_CBTable::selectItem ( item, selected );
-
-    yuiMilestone() << item->label() << " is selected: " << ( selected?"yes":"no" ) <<  endl;
-
-    NCTableTag *tag =  static_cast<NCTableTag *> ( line->GetCol ( checkable_column ) );
-    tag->SetSelected ( selected );
   }
 
   // and redraw
@@ -447,21 +382,21 @@ void YMGA_NCCBTable::selectCurrentItem()
 
 void YMGA_NCCBTable::deselectAllItems()
 {
-  YTableMode mode = selectionMode();
-  if ( mode == YTableSingleLineSelection )
-  {
+//   YCBTableMode mode = tableMode();
+//   if ( mode == YTableSingleLineSelection )
+//   {
     setCurrentItem ( -1 );
     YMGA_CBTable::deselectAllItems();
-  }
-  else
-  {
-    YItemCollection itemCollection = YMGA_CBTable::selectedItems();
-    for ( YItemConstIterator it = itemCollection.begin();
-          it != itemCollection.end(); ++it )
-    {
-      selectItem ( *it, false );  // YTable::selectItem(item,false)
-    }
-  }
+//   }
+//   else
+//   {
+//     YItemCollection itemCollection = YMGA_CBTable::selectedItems();
+//     for ( YItemConstIterator it = itemCollection.begin();
+//           it != itemCollection.end(); ++it )
+//     {
+//       selectItem ( *it, false );  // YTable::selectItem(item,false)
+//     }
+//   }
 
   DrawPad();
 }
@@ -545,8 +480,6 @@ NCursesEvent YMGA_NCCBTable::wHandleInput ( wint_t key )
 {
   NCursesEvent ret;
   int citem  = getCurrentItem();
-  YTableMode mode = selectionMode();
-  bool sendEvent = false;
 
   if ( ! handleInput ( key ) )
   {
@@ -592,25 +525,16 @@ NCursesEvent YMGA_NCCBTable::wHandleInput ( wint_t key )
     }
 
     case KEY_RETURN:
-      sendEvent = true;
-    case KEY_SPACE:
-      if ( mode == YTableSingleLineSelection )
-      {
-        if ( notify() && citem != -1 )
+      if ( notify() && citem != -1 )
           return NCursesEvent::Activated;
-      }
-      else
+    case KEY_SPACE:
+      toggleCurrentItem();
+      // send ValueChanged on Return (like done for NCTree multiSelection)
+      if ( notify())
       {
-        toggleCurrentItem();
-        // send ValueChanged on Return (like done for NCTree multiSelection)
-        if ( notify() && 
-            (sendEvent || 
-             mode == YTableCheckBoxOnFirstColumn || 
-             mode == YTableCheckBoxOnLastColumn) )
-        {
-          YMGA_CBTable::setChangedItem(getCurrentItemPointer());
-          return NCursesEvent::ValueChanged;
-        }
+        YCBTableItem *pItem = dynamic_cast<YCBTableItem*>(getCurrentItemPointer());
+        YMGA_CBTable::setChangedItem(pItem);
+        return NCursesEvent::ValueChanged;
       }
       break;
 
@@ -623,11 +547,32 @@ NCursesEvent YMGA_NCCBTable::wHandleInput ( wint_t key )
     if ( notify() && immediateMode() )
       ret = NCursesEvent::SelectionChanged;
 
-    if ( mode == YTableSingleLineSelection )
       selectCurrentItem();
   }
 
   return ret;
+}
+
+
+void YMGA_NCCBTable::checkItem ( YItem* yitem, bool checked )
+{
+  YCBTableItem * item = dynamic_cast<YCBTableItem *> ( yitem );
+  YUI_CHECK_PTR ( item );
+  NCTableLine *line = ( NCTableLine * ) item->data();
+  YUI_CHECK_PTR ( line );
+
+  item->check(checked);
+  
+  int checkable_column = 0;
+  YCBTableMode mode = tableMode();
+  
+  if ( mode == YCBTableCheckBoxOnLastColumn )
+    checkable_column = columns() -1;
+
+  yuiDebug() << item->label() << " is now " << ( checked?"checked":"unchecked" ) <<  endl;
+
+  NCTableTag *tag =  static_cast<NCTableTag *> ( line->GetCol ( checkable_column ) );
+  tag->SetSelected ( checked );
 }
 
 /**
@@ -635,9 +580,7 @@ NCursesEvent YMGA_NCCBTable::wHandleInput ( wint_t key )
  **/
 void YMGA_NCCBTable::toggleCurrentItem()
 {
-  YTableItem *it =  dynamic_cast<YTableItem *> ( getCurrentItemPointer() );
-  if ( it )
-  {
-    selectItem ( it, ! ( it->selected() ) );
-  }
+  YCBTableItem *item =  dynamic_cast<YCBTableItem *> ( getCurrentItemPointer() );
+  YUI_CHECK_PTR ( item );
+  checkItem(item, !item->checked());  
 }
