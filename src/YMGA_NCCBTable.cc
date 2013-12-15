@@ -56,15 +56,23 @@ YMGA_NCCBTable::YMGA_NCCBTable ( YWidget * parent, YTableHeader *tableHeader, YC
   yuiMilestone() << " Slection mode " << mode <<  std::endl;
 
   // !!! head is UTF8 encoded, thus should be std::vector<NCstring>
-  _header.assign ( tableHeader->columns() +1, NCstring ( "" ) );
+  _header.assign ( tableHeader->columns(), NCstring ( "" ) );
   int columNumber = columns();
+  int checkColumn = (mode == YCBTableCheckBoxOnFirstColumn ? 0 : columNumber - 1); 
 
   for ( int col = 0; col < columNumber; col++ )
   {
     if ( hasColumn ( col ) )
     {
       // set alignment first
-      setAlignment ( col, alignment ( col ) );
+      if (col == checkColumn)
+      {
+        // force alignment to left for checkable colnum
+        // to avoid working on YUI NC plugin low level
+        setAlignment(col,  YAlignBegin);
+      }
+      else
+        setAlignment ( col, alignment ( col ) );
       // and then append header
       _header[ col ] +=  NCstring ( tableHeader->header ( col ) ) ;
     }
@@ -382,21 +390,8 @@ void YMGA_NCCBTable::selectCurrentItem()
 
 void YMGA_NCCBTable::deselectAllItems()
 {
-//   YCBTableMode mode = tableMode();
-//   if ( mode == YTableSingleLineSelection )
-//   {
-    setCurrentItem ( -1 );
-    YMGA_CBTable::deselectAllItems();
-//   }
-//   else
-//   {
-//     YItemCollection itemCollection = YMGA_CBTable::selectedItems();
-//     for ( YItemConstIterator it = itemCollection.begin();
-//           it != itemCollection.end(); ++it )
-//     {
-//       selectItem ( *it, false );  // YTable::selectItem(item,false)
-//     }
-//   }
+  setCurrentItem ( -1 );
+  YMGA_CBTable::deselectAllItems();
 
   DrawPad();
 }
