@@ -1,0 +1,5 @@
+-------------------------------------------------------------------
+Sun Jan 28 15:59:35 CET 2018 - anaselli@linux.it
+- fixed cellChanged (https://bugzilla.redhat.com/show_bug.cgi?id=1524358)
+- 1.0.3
+

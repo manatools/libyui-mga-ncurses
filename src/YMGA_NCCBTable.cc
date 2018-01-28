@@ -106,7 +106,10 @@ void YMGA_NCCBTable::cellChanged ( int index, int colnum, const std::string & ne
   }
   else
   {
-    NCTableCol * cc = cl->GetCol ( colnum );
+    YCBTableMode mode = tableMode();
+
+    int col = (mode == YCBTableCheckBoxOnFirstColumn) ? colnum + 1: colnum ;
+    NCTableCol * cc = cl->GetCol ( col );
 
     if ( !cc )
     {
