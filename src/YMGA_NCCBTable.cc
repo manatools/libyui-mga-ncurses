@@ -545,7 +545,7 @@ NCursesEvent YMGA_NCCBTable::wHandleInput ( wint_t key )
     if ( notify() && immediateMode() )
       ret = NCursesEvent::SelectionChanged;
 
-      selectCurrentItem();
+    selectCurrentItem();
   }
 
   return ret;
