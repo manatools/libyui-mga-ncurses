@@ -42,6 +42,7 @@ public:
 
   virtual YMGA_CBTable * createCBTable ( YWidget * parent, YTableHeader * header_disown, YCBTableMode mode = YCBTableCheckBoxOnFirstColumn );
 
+  virtual YMGAMenuBar * createMenuBar(YWidget * parent);
 
 protected:
 

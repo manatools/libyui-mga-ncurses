@@ -33,6 +33,7 @@
 #include <string>
 
 #include "YMGA_NCCBTable.h"
+#include "YMGANCMenuBar.h"
 
 using std::string;
 
@@ -50,12 +51,20 @@ YMGANCWidgetFactory::~YMGANCWidgetFactory()
 }
 
 
-YMGA_CBTable *
-YMGANCWidgetFactory::createCBTable( YWidget * parent, YTableHeader * header_disown, YCBTableMode mode )
+YMGA_CBTable * YMGANCWidgetFactory::createCBTable( YWidget * parent, YTableHeader * header_disown, YCBTableMode mode )
 {
     YMGA_NCCBTable * table = new YMGA_NCCBTable( parent, header_disown, mode );
     YUI_CHECK_NEW( table );
 
     return table;
 }
+
+YMGAMenuBar * YMGANCWidgetFactory::createMenuBar(YWidget* parent)
+{
+  YMGANCMenuBar * menubar = new YMGANCMenuBar(parent);
+  YUI_CHECK_NEW( menubar );
+
+  return menubar;
+}
+
 
