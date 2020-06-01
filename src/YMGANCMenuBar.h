@@ -88,6 +88,13 @@ public:
      */
     virtual bool HasHotkey(int key) ;
 
+    /**
+    * Enable YMGAMenuItem (menu name or menu entry) to enable/disable it into menubar or menu
+    *
+    * Reimplemented from YMGAMenuBar.
+    **/
+    virtual void enableItem(YItem * menu_item, bool enable=true);
+
 private:
     /**
      * Recursively find the first menu item with the specified index.

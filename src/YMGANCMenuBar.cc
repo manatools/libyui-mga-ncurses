@@ -30,8 +30,10 @@
 #include <yui/YShortcut.h>
 #include <yui/ncurses/NCurses.h>
 #include "YMGANCMenuBar.h"
-#include <yui/ncurses/NCPopupMenu.h>
+#include "NCMGAPopupMenu.h"
 #include <yui/ncurses/YNCursesUI.h>
+#include <yui/mga/YMGAMenuItem.h>
+#include <yui/ncurses/NCLabel.h>
 
 
 struct __MBItem
@@ -51,37 +53,70 @@ struct YMGANCMenuBar::Private
   __MBItem* getNext()
   {
     if (not selected)
-      return items[0];
+    {
+        for(__MBItem *i : items)
+        {
+          YMGAMenuItem * mi = dynamic_cast<YMGAMenuItem *>(i->item);
+          YUI_CHECK_NEW(mi);
+          if (mi->enabled())
+            return i;
+        }
+        return NULL;
+    }
 
+    bool found = false;
     for (uint i=0; i < items.size(); i++)
     {
       if (items[i]->item == selected->item)
       {
+        found = true;
+      }
+      if (found)
+      {
         if (i+1 < items.size())
-          return items[i+1];
-        else return items[i];
+        {
+          YMGAMenuItem * mi = dynamic_cast<YMGAMenuItem *>(items[i+1]->item);
+          YUI_CHECK_NEW(mi);
+          if (mi->enabled())
+            return items[i+1];
+        }
       }
     }
 
-    return NULL;
+    return selected;
   };
 
   __MBItem* getPrevious()
   {
     if (not selected)
-      return items[0];
+    {
+        for(__MBItem *i : items)
+        {
+          YMGAMenuItem * mi = dynamic_cast<YMGAMenuItem *>(i->item);
+          YUI_CHECK_NEW(mi);
+          if (mi->enabled())
+            return i;
+        }
+        return NULL;
+    }
 
-    for (uint i=0; i < items.size(); i++)
+    bool found = false;
+    for (uint i=items.size()-1; i >0 ; i--)
     {
       if (items[i]->item == selected->item)
       {
-        if (i > 0)
+        found = true;
+      }
+      if (found)
+      {
+        YMGAMenuItem * mi = dynamic_cast<YMGAMenuItem *>(items[i-1]->item);
+        YUI_CHECK_NEW(mi);
+        if (mi->enabled())
           return items[i-1];
-        else return items[i];
       }
     }
 
-    return NULL;
+    return selected;
   };
 };
 
@@ -164,6 +199,11 @@ NCursesEvent YMGANCMenuBar::wHandleHotkey( wint_t key )
   }
   YUI_CHECK_NEW(sel);
 
+  YMGAMenuItem *item = dynamic_cast<YMGAMenuItem *>(sel->item);
+  YUI_CHECK_NEW(item);
+  if (!item->enabled())
+    return NCursesEvent::none;
+
   d->selected = sel;
   //Redraw();
   ret = postMenu();
@@ -210,8 +250,8 @@ void YMGANCMenuBar::addItem(YItem* item)
   label.stripHotkey();
   unsigned int h = defsze.H > 0 ? defsze.H : 0;
   defsze = wsze( h < label.height() ? label.height() : h,
-                   defsze.W + label.width() );
-  yuiMilestone() <<  label << std::endl;
+                   defsze.W + label.width()+2 );
+  yuiDebug() <<  label << std::endl;
 
   item->setIndex( ++(d->nextSerialNo) );
 
@@ -244,21 +284,35 @@ void YMGANCMenuBar::wRedraw()
     // first item of any YMenuItem is the menu name
     NClabel label( NCstring( (*it)->label() ));
     label.stripHotkey();
+    YMGAMenuItem * mi = dynamic_cast<YMGAMenuItem *>(*it);
+    if (mi)
+    {
+      if (!mi->enabled())
+      {
+
+        yuiDebug() << mi->label() << " disabled" << std::endl;
+        //disabledList.item.plain disabledList.item.data
+       // win->bkgdset( wStyle().disabledList.item.plain );
+        win->setcolor(0);// bkgdset(style.label.disabledList.item.plain );
+      }
+    }
+    else
+    {
     //unsigned int h = defsze.H > 0 ? defsze.H : 0;
     //defsze = wsze( h < label.height() ? label.height() : h,
     //               defsze.W + label.width() );
 
-    if (d->selected == sel)
-    {
-      win->box( wrect( sel->pos, wsze( label.height(), label.width()+3) ) );
+      if (d->selected == sel)
+      {
+        win->box( wrect( sel->pos, wsze( label.height(), label.width()+3) ) );
+      }
+      win->bkgdset( style.plain );
     }
-    win->bkgdset( style.plain );
-
     win->printw( 0, col, "[" );
     sel->pos = wpos( 0, col+1 );
     sel->hotkey = label.hotkey();
 
-    yuiWarning() <<  sel->item->label() << "  " << sel->pos << " " << sel->hotkey << " " << defsze << std::endl;
+    yuiDebug() <<  sel->item->label() << " pos: " << sel->pos << " hotkey: " << sel->hotkey << " defsize: " << defsze << std::endl;
 
     label.drawAt( *win, style, sel->pos, wsze( -1, label.width() + 3 ), NC::CENTER );
     col = col + label.width() + 4;
@@ -294,12 +348,19 @@ void YMGANCMenuBar::rebuildMenuTree()
 
 NCursesEvent YMGANCMenuBar::postMenu()
 {
+  if (!d->selected)
+    return NCursesEvent::none;
+
+  YMGAMenuItem *item = dynamic_cast<YMGAMenuItem *>(d->selected->item);
+  YUI_CHECK_NEW(item);
+  if (!item->enabled())
+     return NCursesEvent::none;
+
   // add fix heigth of 1 (dont't use win->height() because win might be invalid, bnc#931154)
   wpos at( ScreenPos() + wpos( 1, d->selected->pos.C ) );
   yuiWarning() <<  " position " << ScreenPos() << " menu position " << at <<std::endl;
 
-  YItem *item = d->selected->item;
-  NCPopupMenu * dialog = new NCPopupMenu( at, item->childrenBegin(), item->childrenEnd() );
+  NCMGAPopupMenu * dialog = new NCMGAPopupMenu( at, item->childrenBegin(), item->childrenEnd() );
 
   YUI_CHECK_NEW( dialog );
 
@@ -314,6 +375,14 @@ NCursesEvent YMGANCMenuBar::postMenu()
   NCursesEvent ret = NCursesEvent::menu;
   ret.selection = findMenuItem( selection );
   yuiMilestone() <<  "selection " << selection << "  " << (ret.selection ? ret.selection->label() : "---") << std::endl;
+  if (!ret.selection)
+  {
+    YDialog::deleteTopmostDialog();
+    return NCursesEvent::none;
+  }
+
+  yuiMilestone() << dialog->isTopmostDialog() << std::endl;
+
   YDialog::deleteTopmostDialog();
 
   return ret;
@@ -374,6 +443,10 @@ void YMGANCMenuBar::assignUniqueIndex( YItemIterator begin, YItemIterator end )
 }
 
 
+void YMGANCMenuBar::enableItem(YItem* menu_item, bool enable)
+{
+  YMGAMenuBar::enableItem(menu_item, enable);
+}
 
 
 
