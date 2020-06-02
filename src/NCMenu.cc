@@ -94,11 +94,9 @@ public:
                          NCTableStyle & tableStyle,
                          bool active ) const
     {
-//         NClabel l(NCstring(yitem->label()));
-//         l.stripHotkey();
-//         yuiDebug() << yitem->label() << " hotcol: "<< l.hotpos() <<  " hotkey: " << l.hotkey() << std::endl;
-//
-//         tableStyle.SetHotCol(1);
+         NClabel l(NCstring(yitem->label()));
+         l.stripHotkey();
+         yuiDebug() << yitem->label() << " hotcol: "<< l.hotpos() <<  " hotkey: " << l.hotkey() << std::endl;
 
         if ( !isSpecial() )
             w.bkgdset( tableStyle.hotBG( vstate, NCTableCol::PLAIN ) );
@@ -107,54 +105,17 @@ public:
 
         yuiDebug() << "tableStyle hotcol: " << tableStyle.listStyle().title << " bg: " << tableStyle.hotBG(vstate, tableStyle.HotCol()) << std::endl;
 
+
         NCTableLine::DrawAt( w, at, tableStyle, active );
-
-
-
-
-//         if ( ! prefix )
-//         {
-//             prefix = new chtype[prefixLen()];
-//             chtype * tagend = &prefix[prefixLen()-1];
-//             *tagend-- = ACS_HLINE;
-//             *tagend-- = fchild ? ACS_TTEE : ACS_HLINE;
-//
-//             if ( parent )
-//             {
-//                 *tagend-- = nsibling ? ACS_LTEE : ACS_LLCORNER;
-//
-//                 for ( NCMenuLine * p = parent; p; p = p->parent )
-//                 {
-//                     *tagend-- = p->nsibling ? ACS_VLINE : ( ' '&A_CHARTEXT );
-//                 }
-//             }
-//             else
-//             {
-//                 *tagend-- = ACS_HLINE;
-//             }
-//         }
+        // NOTE I couldn't be able to fix hot char representation, so i had to force it
+        if (l.hasHotkey())
+        {
+          w.move(at.Pos.L, l.hotpos());
+          w.addch(l.hotkey() | A_UNDERLINE);
+        }
 
         w.move( at.Pos.L, at.Pos.C );
 
-
-
-        //w.add_attr_char(); //CUR_insch('_');
-
-//         unsigned i = 0;
-//
-//         for ( ; i < prefixLen(); ++i )
-//             w.addch( prefix[i] );
-//
-//         w.move( at.Pos.L, at.Pos.C + prefixLen() - 2 );
-
-//         if ( fchild && !isSpecial() )
-//             w.bkgdset( tableStyle.highlightBG( vstate, NCTableCol::HINT,
-//                                                NCTableCol::SEPARATOR ) );
-//
-//         if ( fchild && !fchild->isVisible() )
-//             w.addch( '+' );
-//         else
-//             w.addch( prefix[prefixLen() - 2] );
     }
 };
 
