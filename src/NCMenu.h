@@ -75,8 +75,6 @@ protected:
     virtual void doneMultipleChanges()	{
         stopMultidraw();
     }
-    bool HasHotkey(int key);
-    NCursesEvent wHandleHotkey( wint_t key );
 
 public:
 
@@ -87,7 +85,8 @@ public:
     virtual int preferredHeight();
     virtual void setSize( int newWidth, int newHeight );
 
-
+    bool HasHotkey(int key);
+    NCursesEvent wHandleHotkey( wint_t key );
 
     virtual void rebuildTree();
 

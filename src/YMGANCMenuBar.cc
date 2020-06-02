@@ -191,7 +191,7 @@ NCursesEvent YMGANCMenuBar::wHandleHotkey( wint_t key )
   __MBItem *sel = NULL;
   for (struct __MBItem *i : d->items)
   {
-    if (wint_t(i->hotkey) == key)
+    if ( (tolower(i->hotkey)) == tolower(key))
     {
       sel = i;
       break;

@@ -51,7 +51,9 @@ protected:
     virtual int preferredWidth();
     virtual int preferredHeight();
 
-    //virtual void setSize( int newWidth, int newHeight );
+    bool HasHotkey(int key);
+    NCursesEvent wHandleHotkey( wint_t key );
+
 
 public:
 

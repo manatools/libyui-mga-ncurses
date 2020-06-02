@@ -108,6 +108,27 @@ int NCMGAPopupMenu::preferredWidth()
 }
 
 
+bool NCMGAPopupMenu::HasHotkey(int key)
+{
+  yuiDebug() << key << std::endl;
+
+  return d->menu->HasHotkey(key);
+}
+
+NCursesEvent NCMGAPopupMenu::wHandleHotkey( wint_t key )
+{
+    yuiDebug() << "Key: " << key << std::endl;
+    if ( key >= 0 && key < UCHAR_MAX ) //  < myPad()->setItemByKey( key ) )
+    {
+      NCursesEvent ev = d->menu->wHandleHotkey(key);
+      yuiDebug() << "event: " << ev << std::endl;
+      if (ev != NCursesEvent::none)
+        return wHandleInput( KEY_SPACE );
+    }
+    return NCursesEvent::none;
+}
+
+
 NCursesEvent NCMGAPopupMenu::wHandleInput( wint_t ch )
 {
     NCursesEvent ret;

@@ -75,6 +75,7 @@ public:
           SetState(S_HEADLINE);
           Append( new NCTableCol( NCstring( yitem->label() ) ) );
         }
+        stripHotkeys();
     }
 
     virtual ~NCMenuLine() {
@@ -93,19 +94,21 @@ public:
                          NCTableStyle & tableStyle,
                          bool active ) const
     {
-        NClabel l(NCstring(yitem->label()));
-        l.stripHotkey();
-        yuiDebug() << yitem->label() << " hotcol: "<< l.hotpos() <<  " hotkey: " << l.hotkey() << std::endl;
-        tableStyle.SetHotCol(l.hotpos());
+//         NClabel l(NCstring(yitem->label()));
+//         l.stripHotkey();
+//         yuiDebug() << yitem->label() << " hotcol: "<< l.hotpos() <<  " hotkey: " << l.hotkey() << std::endl;
+//
+//         tableStyle.SetHotCol(1);
 
         if ( !isSpecial() )
-            w.bkgdset( tableStyle.getBG( vstate, NCTableCol::SEPARATOR ) );
+            w.bkgdset( tableStyle.hotBG( vstate, NCTableCol::PLAIN ) );
 
-        tableStyle.highlightBG( vstate, NCTableCol::HINT);
+        //tableStyle.highlightBG( vstate, NCTableCol::HINT);
 
         yuiDebug() << "tableStyle hotcol: " << tableStyle.listStyle().title << " bg: " << tableStyle.hotBG(vstate, tableStyle.HotCol()) << std::endl;
 
         NCTableLine::DrawAt( w, at, tableStyle, active );
+
 
 
 
@@ -353,7 +356,7 @@ NCursesEvent NCMenu::wHandleHotkey( wint_t key )
     yuiDebug() << "Key: " << key << std::endl;
     if ( key >= 0 && key < UCHAR_MAX ) //  < myPad()->setItemByKey( key ) )
     {
-      unsigned hkey = tolower( key );
+      int hkey = tolower( key );
       for ( YItemIterator it = itemsBegin(); it < itemsEnd(); ++it )
       {
           YMGAMenuItem *mi = dynamic_cast<YMGAMenuItem*> (*it);
@@ -362,12 +365,16 @@ NCursesEvent NCMenu::wHandleHotkey( wint_t key )
           {
             NClabel l (NCstring( mi->label() ));
             l.stripHotkey();
-            yuiDebug() << mi->label() << " " << l << "hkey: " <<  l.hotkey() << std::endl;
-            if ((wint_t)l.hotkey() == hkey)
+            yuiDebug() << mi->label() << " " << l << " hotpos: " << l.hotpos() << " hkey: " <<  l.hotkey() << std::endl;
+            if (tolower(l.hotkey()) == hkey)
             {
               selectItem(mi->index());
               return wHandleInput( KEY_RETURN );
             }
+          }
+          else
+          {
+            yuiDebug() << mi->label() << " disabled" << std::endl;
           }
       }
     }
@@ -406,7 +413,7 @@ void NCMenu::CreateTreeLine( NCTreePad * pad, YItem * item )
         pad->ShowItem( getTreeLine( at ) );
     }
 
-    line->stripHotkeys();
+    //line->stripHotkeys();
 }
 
 // Returns current item (pure virtual in YTree)
@@ -447,26 +454,36 @@ NCursesEvent NCMenu::wHandleInput( wint_t key )
 
     if ( !currentItem )
         return ret;
+    YMGAMenuItem *mi = dynamic_cast<YMGAMenuItem*>(  getCurrentItem() );
+    if (!mi)
+      return ret;
 
-    if ( ! handled )
+    if (mi->enabled())
     {
-        switch ( key )
-        {
-        // KEY_SPACE is handled in NCMenuLine::handleInput
-        case KEY_RETURN:
+      if ( ! handled )
+      {
+          switch ( key )
+          {
+          // KEY_SPACE is handled in NCMenuLine::handleInput
+          case KEY_RETURN:
 
-            if ( notify() )
-            {
-                return NCursesEvent::Activated;
-            }
-            break;
-        }
+              if ( notify() )
+              {
+                  return NCursesEvent::Activated;
+              }
+              else
+              {
+                ret =  NCursesEvent::button;
+              }
+              break;
+          }
+      }
+
+      YTree::selectItem( const_cast<YItem *>( currentItem ), true );
+
+      if ( notify() && immediateMode() && ( oldCurrentItem != currentItem ) )
+          ret = NCursesEvent::SelectionChanged;
     }
-
-    YTree::selectItem( const_cast<YItem *>( currentItem ), true );
-
-    if ( notify() && immediateMode() && ( oldCurrentItem != currentItem ) )
-        ret = NCursesEvent::SelectionChanged;
 
     yuiDebug() << "Notify: " << ( notify() ? "true" : "false" ) <<
                " Return event: " << ret.reason << std::endl;
