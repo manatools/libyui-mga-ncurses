@@ -68,7 +68,7 @@ public:
         {
             SetState(S_HEADLINE);
             yuiDebug() << mi->label() << " has submenu" << std::endl;
-            Append( new NCTableCol( NCstring( yitem->label() + " >" ) ) );
+            Append( new NCTableCol( NCstring( yitem->label() + " ..." ) ) );
         }
         else
         {

@@ -67,7 +67,7 @@ NCMGAPopupMenu::NCMGAPopupMenu( const wpos & at, YItemIterator begin, YItemItera
         YMGAMenuItem * item = dynamic_cast<YMGAMenuItem *>( *it );
         YUI_CHECK_PTR( item );
 
-        std::string label = item->hasChildren() ? item->label() + " >" : item->label();
+        std::string label = item->hasChildren() ? item->label() + " ..." : item->label();
         YMGAMenuItem *menuItem = new YMGAMenuItem ( label, item->iconName() );
         menuItem->enable(item->enabled());
 
