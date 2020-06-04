@@ -268,7 +268,7 @@ void YMGANCMenuBar::wRedraw()
   if ( !win )
     return;
 
-  unsigned int col=0;
+  int col=0;
   for ( YItemConstIterator it = itemsBegin() ; it != itemsEnd(); ++it )
   {
     __MBItem *sel = NULL;
@@ -322,7 +322,12 @@ void YMGANCMenuBar::wRedraw()
     haveUtf8() ? win->add_wch( 0, col - 1, WACS_DARROW )
     : win->addch( 0, col - 1, ACS_DARROW );
     col++;
-
+    if (col < win->width())
+    {
+      win->move(0, col);
+      win->bkgdset( style.plain );
+      win->clrtoeol();
+    }
   }
 
   #if 0
