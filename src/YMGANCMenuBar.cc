@@ -240,6 +240,9 @@ NCursesEvent YMGANCMenuBar::wHandleInput( wint_t key )
 
 void YMGANCMenuBar::addItem(YItem* item)
 {
+  if (itemsBegin() == itemsEnd())
+    defsze = wsze(0,0);
+
   YMGAMenuBar::addItem(item);
 
   __MBItem *it = new( __MBItem);
@@ -248,10 +251,11 @@ void YMGANCMenuBar::addItem(YItem* item)
 
   NClabel label( NCstring( item->label() ));
   label.stripHotkey();
+
   unsigned int h = defsze.H > 0 ? defsze.H : 0;
   defsze = wsze( h < label.height() ? label.height() : h,
                    defsze.W + label.width()+5 );
-  yuiDebug() <<  label << std::endl;
+  yuiDebug() <<  "label: " << label << " defsze: " << defsze << std::endl;
 
   item->setIndex( ++(d->nextSerialNo) );
 
@@ -294,9 +298,7 @@ void YMGANCMenuBar::wRedraw()
         disabled = true;
 
         yuiDebug() << mi->label() << " disabled" << std::endl;
-        //disabledList.item.plain disabledList.item.data
-       // win->bkgdset( wStyle().disabledList.item.plain );
-        win->bkgdset(wStyle().disabledList.item.plain);  //style.disabledList.item.plain );
+        win->bkgdset(wStyle().disabledList.item.plain);
       }
       else
       {
