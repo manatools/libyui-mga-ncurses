@@ -250,7 +250,7 @@ void YMGANCMenuBar::addItem(YItem* item)
   label.stripHotkey();
   unsigned int h = defsze.H > 0 ? defsze.H : 0;
   defsze = wsze( h < label.height() ? label.height() : h,
-                   defsze.W + label.width()+2 );
+                   defsze.W + label.width()+5 );
   yuiDebug() <<  label << std::endl;
 
   item->setIndex( ++(d->nextSerialNo) );
@@ -285,28 +285,24 @@ void YMGANCMenuBar::wRedraw()
     NClabel label( NCstring( (*it)->label() ));
     label.stripHotkey();
     YMGAMenuItem * mi = dynamic_cast<YMGAMenuItem *>(*it);
+    bool disabled = false;
+
     if (mi)
     {
       if (!mi->enabled())
       {
+        disabled = true;
 
         yuiDebug() << mi->label() << " disabled" << std::endl;
         //disabledList.item.plain disabledList.item.data
        // win->bkgdset( wStyle().disabledList.item.plain );
-        win->setcolor(0);// bkgdset(style.label.disabledList.item.plain );
+        win->bkgdset(wStyle().disabledList.item.plain);  //style.disabledList.item.plain );
       }
-    }
-    else
-    {
-    //unsigned int h = defsze.H > 0 ? defsze.H : 0;
-    //defsze = wsze( h < label.height() ? label.height() : h,
-    //               defsze.W + label.width() );
-
-      if (d->selected == sel)
+      else
       {
-        win->box( wrect( sel->pos, wsze( label.height(), label.width()+3) ) );
+        win->bkgdset( style.plain );
       }
-      win->bkgdset( style.plain );
+
     }
     win->printw( 0, col, "[" );
     sel->pos = wpos( 0, col+1 );
@@ -314,7 +310,10 @@ void YMGANCMenuBar::wRedraw()
 
     yuiDebug() <<  sel->item->label() << " pos: " << sel->pos << " hotkey: " << sel->hotkey << " defsize: " << defsze << std::endl;
 
-    label.drawAt( *win, style, sel->pos, wsze( -1, label.width() + 3 ), NC::CENTER );
+    if (disabled)
+      label.drawAt( *win, wStyle().disabled, sel->pos, wsze( -1, label.width() + 3 ), NC::CENTER );
+    else
+      label.drawAt( *win, style, sel->pos, wsze( -1, label.width() + 3 ), NC::CENTER );
     col = col + label.width() + 4;
     win->printw( 0, col, "]" );
 
@@ -322,17 +321,12 @@ void YMGANCMenuBar::wRedraw()
     : win->addch( 0, col - 1, ACS_DARROW );
     col++;
 
-    //if (d->selected == sel)
-    {
-      win->bkgdset( style.scrl );
-    }
-    //
-
   }
 
   #if 0
+  win->vline( ' ', win->maxx() - col +1);
   win->vline( 0, win->maxx() - 1, win->height(), ' ' );
-  if ( h > 1 )
+  if ( h > 1 )win->vline( 0, win->maxx() - 1, win->height(), ' ' );
   {
   win->box( wrect( 0, win->size() - wsze( 0, 1 ) ) );
 }
