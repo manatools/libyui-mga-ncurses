@@ -293,7 +293,12 @@ void YMGANCMenuBar::wRedraw()
 
     if (mi)
     {
-      if (!mi->enabled())
+      if (mi->hidden())
+      {
+        yuiDebug() << mi->label() << " hidden" << std::endl;
+        continue;
+      }
+      else if (!mi->enabled())
       {
         disabled = true;
 
@@ -449,6 +454,10 @@ void YMGANCMenuBar::enableItem(YItem* menu_item, bool enable)
   YMGAMenuBar::enableItem(menu_item, enable);
 }
 
+void YMGANCMenuBar::hideItem(YItem* menu_item, bool invisible)
+{
+  YMGAMenuBar::hideItem(menu_item, invisible);
+}
 
 
 

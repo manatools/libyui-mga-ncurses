@@ -57,10 +57,16 @@ public:
         , prefix( 0 )
     {
         YMGAMenuItem *mi = dynamic_cast<YMGAMenuItem*> (yitem);
-        if ( !mi->enabled() )
+        if ( mi->hidden())
+        {
+            yuiDebug() << mi->label() << " hidden" << std::endl;
+            SetState(S_HIDDEN);
+        }
+        else  if ( !mi->enabled() )
         {
             yuiDebug() << mi->label() << " disabled" << std::endl;
             SetState( S_DISABELED );
+
         }
 
         // leaving next even if managed into MGAPopupMenu

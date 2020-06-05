@@ -95,6 +95,13 @@ public:
     **/
     virtual void enableItem(YItem * menu_item, bool enable=true);
 
+    /**
+    * Hide YMGAMenuItem (menu name or menu entry) to hide/show it into menubar or menu
+    *
+    * Reimplemented from YMGAMenuBar.
+    **/
+    virtual void hideItem(YItem * menu_item, bool invisible=true);
+
 private:
     /**
      * Recursively find the first menu item with the specified index.
