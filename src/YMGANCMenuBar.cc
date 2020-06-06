@@ -58,7 +58,7 @@ struct YMGANCMenuBar::Private
         {
           YMGAMenuItem * mi = dynamic_cast<YMGAMenuItem *>(i->item);
           YUI_CHECK_NEW(mi);
-          if (mi->enabled())
+          if (mi->enabled() && !mi->hidden())
             return i;
         }
         return NULL;
@@ -77,7 +77,7 @@ struct YMGANCMenuBar::Private
         {
           YMGAMenuItem * mi = dynamic_cast<YMGAMenuItem *>(items[i+1]->item);
           YUI_CHECK_NEW(mi);
-          if (mi->enabled())
+          if (mi->enabled() && !mi->hidden())
             return items[i+1];
         }
       }
@@ -94,7 +94,7 @@ struct YMGANCMenuBar::Private
         {
           YMGAMenuItem * mi = dynamic_cast<YMGAMenuItem *>(i->item);
           YUI_CHECK_NEW(mi);
-          if (mi->enabled())
+          if (mi->enabled() && !mi->hidden())
             return i;
         }
         return NULL;
@@ -111,7 +111,7 @@ struct YMGANCMenuBar::Private
       {
         YMGAMenuItem * mi = dynamic_cast<YMGAMenuItem *>(items[i-1]->item);
         YUI_CHECK_NEW(mi);
-        if (mi->enabled())
+        if (mi->enabled() && !mi->hidden())
           return items[i-1];
       }
     }

@@ -76,6 +76,8 @@ protected:
         stopMultidraw();
     }
 
+    virtual void activate() {}
+
 public:
 
     NCMenu( YWidget * parent  );
