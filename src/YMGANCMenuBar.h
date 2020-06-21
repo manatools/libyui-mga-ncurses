@@ -59,11 +59,8 @@ public:
 
     virtual void setSize( int newWidth, int newHeight );
 
-    virtual void rebuildMenuTree();
-
     virtual NCursesEvent wHandleHotkey( wint_t key );
     virtual NCursesEvent wHandleInput( wint_t key );
-
 
     virtual bool setKeyboardFocus()
     {
@@ -81,6 +78,14 @@ public:
      * Reimplemented from YSelectionWidget.
      **/
     virtual void addItem( YItem * item );
+
+    /**
+     * Add multiple items. For some UIs, this can be more efficient than
+     * calling addItem() multiple times.
+     *
+     * Reimplemented from YSelectionWidget.
+     **/
+    virtual void addItems( const YItemCollection & itemCollection );
 
     /**
      * Reimplemnted to check all the hotkeys from YMenuItems

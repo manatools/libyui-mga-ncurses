@@ -266,6 +266,14 @@ void YMGANCMenuBar::addItem(YItem* item)
         assignUniqueIndex( item->childrenBegin(), item->childrenEnd() );
 }
 
+void YMGANCMenuBar::addItems(const YItemCollection& itemCollection)
+{
+  YSelectionWidget::addItems(itemCollection);
+
+  wRedraw();
+}
+
+
 void YMGANCMenuBar::wRedraw()
 {
   if ( !win )
@@ -352,12 +360,6 @@ void YMGANCMenuBar::wRedraw()
   win->box( wrect( 0, win->size() - wsze( 0, 1 ) ) );
 }
 #endif
-}
-
-
-void YMGANCMenuBar::rebuildMenuTree()
-{
-  // NOP
 }
 
 
