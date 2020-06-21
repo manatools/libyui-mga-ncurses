@@ -216,22 +216,25 @@ NCursesEvent YMGANCMenuBar::wHandleInput( wint_t key )
   yuiDebug() << "wHandleInput " << key << std::endl;
   NCursesEvent ret;
 
-  switch ( key )
+  if (itemsBegin() != itemsEnd())
   {
-    case KEY_LEFT:
-      d->selected = d->getPrevious();
-      wRedraw();
-      break;
-    case KEY_RIGHT:
-      d->selected = d->getNext();
-      wRedraw();
-      break;
-    case KEY_HOTKEY:
-    case KEY_SPACE:
-    case KEY_RETURN:
-    case KEY_DOWN:
-      ret = postMenu();
-      break;
+    switch ( key )
+    {
+      case KEY_LEFT:
+        d->selected = d->getPrevious();
+        wRedraw();
+        break;
+      case KEY_RIGHT:
+        d->selected = d->getNext();
+        wRedraw();
+        break;
+      case KEY_HOTKEY:
+      case KEY_SPACE:
+      case KEY_RETURN:
+      case KEY_DOWN:
+        ret = postMenu();
+        break;
+    }
   }
 
   return ret;
@@ -267,6 +270,12 @@ void YMGANCMenuBar::wRedraw()
 {
   if ( !win )
     return;
+
+  if (itemsBegin() == itemsEnd())
+  {
+    win->deleteln();
+    return;
+  }
 
   int col=0;
   for ( YItemConstIterator it = itemsBegin() ; it != itemsEnd(); ++it )
@@ -457,6 +466,16 @@ void YMGANCMenuBar::enableItem(YItem* menu_item, bool enable)
 void YMGANCMenuBar::hideItem(YItem* menu_item, bool invisible)
 {
   YMGAMenuBar::hideItem(menu_item, invisible);
+}
+
+void YMGANCMenuBar::deleteAllItems()
+{
+  for (__MBItem *i : d->items)
+    delete i;
+  d->items.clear();
+
+  YSelectionWidget::deleteAllItems();
+  wRedraw();
 }
 
 

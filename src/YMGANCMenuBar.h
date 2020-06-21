@@ -102,6 +102,13 @@ public:
     **/
     virtual void hideItem(YItem * menu_item, bool invisible=true);
 
+    /**
+     * Delete all items.
+     *
+     * Reimplemented from YSelectionWidget
+     **/
+    virtual void deleteAllItems();
+
 private:
     /**
      * Recursively find the first menu item with the specified index.
