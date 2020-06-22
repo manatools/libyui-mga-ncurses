@@ -475,9 +475,11 @@ void YMGANCMenuBar::deleteAllItems()
   for (__MBItem *i : d->items)
     delete i;
   d->items.clear();
+  d->selected = NULL;
+  d->nextSerialNo = 0;
 
   YSelectionWidget::deleteAllItems();
-  wRedraw();
+  //wRedraw();
 }
 
 
