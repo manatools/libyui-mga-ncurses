@@ -187,7 +187,7 @@ bool YMGANCMenuBar::HasHotkey(int key)
 NCursesEvent YMGANCMenuBar::wHandleHotkey( wint_t key )
 {
   yuiDebug() << key << std::endl;
-  NCursesEvent ret;
+  NCursesEvent ret = NCursesEvent::none;
   __MBItem *sel = NULL;
   for (struct __MBItem *i : d->items)
   {
@@ -214,7 +214,7 @@ NCursesEvent YMGANCMenuBar::wHandleHotkey( wint_t key )
 NCursesEvent YMGANCMenuBar::wHandleInput( wint_t key )
 {
   yuiDebug() << "wHandleInput " << key << std::endl;
-  NCursesEvent ret;
+  NCursesEvent ret = NCursesEvent::none;
 
   if (itemsBegin() != itemsEnd())
   {
