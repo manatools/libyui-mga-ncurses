@@ -64,26 +64,36 @@ NCMGAPopupMenu::NCMGAPopupMenu( const wpos & at, YItemIterator begin, YItemItera
     defsze = wsze(1, 1);
     for ( YItemIterator it = begin; it != end; ++it )
     {
-        YMGAMenuItem * item = dynamic_cast<YMGAMenuItem *>( *it );
-        YUI_CHECK_PTR( item );
+        YMenuSeparator *separator = dynamic_cast<YMenuSeparator *>( *it );
+        if (separator)
+        {
+          YMenuSeparator * sep = new YMenuSeparator(NULL);
+          d->menu->addItem( sep );
+          defsze.H = defsze.H > 9 ? 10 : defsze.H + 1;
+        }
+        else
+        {
+          YMGAMenuItem * item = dynamic_cast<YMGAMenuItem *>( *it );
+          YUI_CHECK_PTR( item );
 
-        std::string label = item->hasChildren() ? item->label() + " ..." : item->label();
-        YMGAMenuItem *menuItem = new YMGAMenuItem ( label, item->iconName() );
-        menuItem->enable(item->enabled());
-        menuItem->hide(item->hidden());
+          std::string label = item->hasChildren() ? item->label() + " ..." : item->label();
+          YMGAMenuItem *menuItem = new YMGAMenuItem ( label, item->iconName() );
+          menuItem->enable(item->enabled());
+          menuItem->hide(item->hidden());
 
-        d->menu->addItem( menuItem );
-        d->itemsMap[menuItem] = item;
+          d->menu->addItem( menuItem );
+          d->itemsMap[menuItem] = item;
 
-        if (d->maxlen < label.length()+1)
-            d->maxlen = label.length()+1;
-        // let's assume to have a menu enable scrolling for more than 10 lines
-        int h = defsze.H > 9 ? 10 : defsze.H + 1;
-        // let's assume to have a menu enable scrolling for more than 40 columns
-        int w = d->maxlen > 40 ? 40 : d->maxlen;
+          if (d->maxlen < label.length()+1)
+              d->maxlen = label.length()+1;
+          // let's assume to have a menu enable scrolling for more than 10 lines
+          int h = defsze.H > 9 ? 10 : defsze.H + 1;
+          // let's assume to have a menu enable scrolling for more than 40 columns
+          int w = d->maxlen > 40 ? 40 : d->maxlen;
 
-        defsze = wsze( h,  w );
-        yuiDebug() << "Add Item: " << item->label()  << " len: "<< label.length() << " HxW "<< h << "x" << w << std::endl;
+          defsze = wsze( h,  w );
+          yuiDebug() << "Add Item: " << item->label()  << " len: "<< label.length() << " HxW "<< h << "x" << w << std::endl;
+        }
     }
     yuiDebug() << "defsze: " << defsze << "line length: " << d->maxlen << std::endl;
 

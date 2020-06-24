@@ -56,32 +56,44 @@ public:
         , fchild( 0 )
         , prefix( 0 )
     {
-        YMGAMenuItem *mi = dynamic_cast<YMGAMenuItem*> (yitem);
-        if ( mi->hidden())
-        {
-            yuiDebug() << mi->label() << " hidden" << std::endl;
-            SetState(S_HIDDEN);
-        }
-        else  if ( !mi->enabled() )
-        {
-            yuiDebug() << mi->label() << " disabled" << std::endl;
-            SetState( S_DISABELED );
 
-        }
+       YMenuSeparator *separator = dynamic_cast<YMenuSeparator *>(yitem);
+       if (separator)
+       {
+         //Append( new NCTableCol( "", NCTableCol::SEPARATOR ) );
+         SetState( S_DISABELED );
+       }
+       else
+       {
+          YMGAMenuItem *mi = dynamic_cast<YMGAMenuItem*> (yitem);
+          YUI_CHECK_PTR(mi);
 
-        // leaving next even if managed into MGAPopupMenu
-        if ( yitem->hasChildren() )
-        {
+          if ( mi->hidden())
+          {
+              yuiDebug() << mi->label() << " hidden" << std::endl;
+              SetState(S_HIDDEN);
+          }
+          else  if ( !mi->enabled() )
+          {
+              yuiDebug() << mi->label() << " disabled" << std::endl;
+              SetState( S_DISABELED );
+          }
+          else
+          {
             SetState(S_HEADLINE);
-            yuiDebug() << mi->label() << " has submenu" << std::endl;
-            Append( new NCTableCol( NCstring( yitem->label() + " ..." ) ) );
-        }
-        else
-        {
-          SetState(S_HEADLINE);
-          Append( new NCTableCol( NCstring( yitem->label() ) ) );
-        }
-        stripHotkeys();
+          }
+
+          // leaving next even if managed into MGAPopupMenu
+          if ( yitem->hasChildren() )
+          {   yuiDebug() << mi->label() << " has submenu" << std::endl;
+              Append( new NCTableCol( NCstring( yitem->label() + " ..." ) ) );
+          }
+          else
+          {
+            Append( new NCTableCol( NCstring( yitem->label() ) ) );
+          }
+          stripHotkeys();
+       }
     }
 
     virtual ~NCMenuLine() {
@@ -100,28 +112,33 @@ public:
                          NCTableStyle & tableStyle,
                          bool active ) const
     {
-         NClabel l(NCstring(yitem->label()));
-         l.stripHotkey();
-         yuiDebug() << yitem->label() << " hotcol: "<< l.hotpos() <<  " hotkey: " << l.hotkey() << std::endl;
-
-        if ( !isSpecial() )
-            w.bkgdset( tableStyle.hotBG( vstate, NCTableCol::PLAIN ) );
-
-        //tableStyle.highlightBG( vstate, NCTableCol::HINT);
-
-        yuiDebug() << "tableStyle hotcol: " << tableStyle.listStyle().title << " bg: " << tableStyle.hotBG(vstate, tableStyle.HotCol()) << std::endl;
-
-
-        NCTableLine::DrawAt( w, at, tableStyle, active );
-        // NOTE I couldn't be able to fix hot char representation, so i had to force it
-        if (l.hasHotkey())
+        YMenuSeparator *separator = dynamic_cast<YMenuSeparator *>(yitem);
+        if (separator)
         {
-          w.move(at.Pos.L, l.hotpos());
-          w.addch(l.hotkey() | A_UNDERLINE);
+            w.move( at.Pos.L, at.Pos.C );
+            w.hline(ACS_HLINE, 0);
         }
+        else
+        {
+            NClabel l(NCstring(yitem->label()));
+            l.stripHotkey();
+            yuiDebug() << yitem->label() << " hotcol: "<< l.hotpos() <<  " hotkey: " << l.hotkey() << std::endl;
 
-        w.move( at.Pos.L, at.Pos.C );
+            if ( !isSpecial() )
+                w.bkgdset( tableStyle.hotBG( vstate, NCTableCol::PLAIN ) );
 
+            yuiDebug() << "tableStyle hotcol: " << tableStyle.listStyle().title << " bg: " << tableStyle.hotBG(vstate, tableStyle.HotCol()) << std::endl;
+
+
+            NCTableLine::DrawAt( w, at, tableStyle, active );
+            // NOTE I couldn't be able to fix hot char representation, so i had to force it
+            if (l.hasHotkey())
+            {
+                w.move(at.Pos.L, l.hotpos());
+                w.addch(l.hotkey() | A_UNDERLINE);
+            }
+            //w.move( at.Pos.L, at.Pos.C );
+        }
     }
 };
 
@@ -210,7 +227,7 @@ YMenuItem * NCMenu::getCurrentItem() const
     {
         const NCMenuLine * cline = dynamic_cast<const NCMenuLine *>( myPad()->GetCurrentLine() );
 
-        if ( cline )
+        if ( cline && cline->isEnabeled())
             yitem = cline->YItem();
     }
 
