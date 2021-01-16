@@ -61,7 +61,7 @@ public:
        if (separator)
        {
          //Append( new NCTableCol( "", NCTableCol::SEPARATOR ) );
-         SetState( S_DISABELED );
+         SetState( S_DISABLED );
        }
        else
        {
@@ -76,7 +76,7 @@ public:
           else  if ( !mi->enabled() )
           {
               yuiDebug() << mi->label() << " disabled" << std::endl;
-              SetState( S_DISABELED );
+              SetState( S_DISABLED );
           }
           else
           {
@@ -125,9 +125,9 @@ public:
             yuiDebug() << yitem->label() << " hotcol: "<< l.hotpos() <<  " hotkey: " << l.hotkey() << std::endl;
 
             if ( !isSpecial() )
-                w.bkgdset( tableStyle.hotBG( vstate, NCTableCol::PLAIN ) );
+                w.bkgdset( tableStyle.hotBG( _vstate, NCTableCol::PLAIN ) );
 
-            yuiDebug() << "tableStyle hotcol: " << tableStyle.listStyle().title << " bg: " << tableStyle.hotBG(vstate, tableStyle.HotCol()) << std::endl;
+            yuiDebug() << "tableStyle hotcol: " << tableStyle.listStyle().title << " bg: " << tableStyle.hotBG(_vstate, tableStyle.HotCol()) << std::endl;
 
 
             NCTableLine::DrawAt( w, at, tableStyle, active );
@@ -227,7 +227,7 @@ YMenuItem * NCMenu::getCurrentItem() const
     {
         const NCMenuLine * cline = dynamic_cast<const NCMenuLine *>( myPad()->GetCurrentLine() );
 
-        if ( cline && cline->isEnabeled())
+        if ( cline && cline->isEnabled())
             yitem = cline->YItem();
     }
 
