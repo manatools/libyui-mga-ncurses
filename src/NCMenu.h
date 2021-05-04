@@ -31,7 +31,7 @@
 
 #include <yui/YTree.h>
 #include <yui/YMenuItem.h>
-#include "NCPadWidget.h"
+#include <yui/ncurses/NCPadWidget.h>
 #include <yui/ncurses/NCTreePad.h>
 #include <yui/ncurses/NCTablePad.h>
 
